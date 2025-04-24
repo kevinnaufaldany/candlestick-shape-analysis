@@ -111,13 +111,14 @@ The script fetches data from a Google Spreadsheet. You need to create and share 
 
 ### Step 5: Interpret the Results
 
-- Use the dropdown menu to select a date and view the candlestick chart for that date.
+- Use the dropdown menu to select a date and view the candlestick chart for that date (according to the date data in your spreadsheet).
+<img src= "pic/img-readme/choose-date.png" style= width:100%>
 - The chart will display the candlestick pattern (e.g., "Hanging Man", "Doji") along with the price details.
 - Click the "Download Chart" button to save the chart as a PNG file with name `candlestick.png`.
 <img src= "pic/img-readme/choose-date-on-data-and-download.png" style= width:100%>
 
-## After Download 
-- You can check on folder pic/the-result [the-result]()
+## Example Result After Download
+- You can check on folder [pic/the-result](https://github.com/kevinnaufaldany/candlestick-shape-analysis/tree/main/pic/the-result)
 
 ## Troubleshooting
 
