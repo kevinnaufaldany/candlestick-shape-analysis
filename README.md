@@ -136,5 +136,9 @@ The script fetches data from a Google Spreadsheet. You need to create and share 
 
 Contributions are welcome! Feel free to open an issue or submit a pull request with improvements or bug fixes.
 
+## License
+This project is licensed under the MIT License.
+
+
 ## Authors
 - [@kevinnaufaldany](https://github.com/kevinnaufaldany)
