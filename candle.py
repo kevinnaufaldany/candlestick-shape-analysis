@@ -7,6 +7,8 @@ import gspread
 from google.auth.transport.requests import Request
 from google.oauth2.service_account import Credentials
 import ipywidgets as widgets
+import zipfile
+import os
 
 # Fungsi untuk mendeteksi pola candlestick (Diperbarui)
 def detect_candlestick_pattern(open_price, close_price, max_price, min_price):
@@ -56,7 +58,6 @@ def detect_candlestick_pattern(open_price, close_price, max_price, min_price):
     elif is_shooting_star:
         return "Shooting Star"
 
-
     # Default: Jika tidak ada pola spesifik yang terdeteksi
     if is_bullish:
         return "Bullish Candle"
@@ -78,7 +79,7 @@ client = gspread.authorize(creds)
 # Buka spreadsheet menggunakan Spreadsheet ID
 try:
     # Ganti 'SPREADSHEET_ID' dengan ID spreadsheet Anda
-    spreadsheet = client.open_by_key('abcdefghijklmnopqrstuvwxyz1234567890')  # Masukkan Spreadsheet ID Anda di sini
+    spreadsheet = client.open_by_key('1IgbQLg5dTXJ-HdzohXDAgtu4KsDGjfO9j0kP0VU9pVA')  # Masukkan Spreadsheet ID Anda di sini
     sheet = spreadsheet.sheet1  # Ambil sheet pertama
 except gspread.exceptions.SpreadsheetNotFound:
     print("Error: Spreadsheet tidak ditemukan. Pastikan Spreadsheet ID benar dan sudah dibagikan dengan email service account.")
@@ -103,7 +104,7 @@ except KeyError as e:
     raise
 
 # Fungsi untuk membuat candlestick chart
-def create_candlestick(max_price, min_price, open_price, close_price, date, pattern):
+def create_candlestick(max_price, min_price, open_price, close_price, date, pattern, filename='candlestick.png'):
     # Bersihkan plot sebelumnya
     plt.clf()
 
@@ -173,11 +174,11 @@ def create_candlestick(max_price, min_price, open_price, close_price, date, patt
             verticalalignment='center', horizontalalignment='left',
             fontsize=10, bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5'))
 
-    # Simpan plot sebagai gambar
-    plt.savefig('candlestick.png', bbox_inches='tight')
+    # Simpan plot sebagai gambar dengan nama file yang diberikan
+    plt.savefig(filename, bbox_inches='tight')
 
     # Tampilkan chart di Colab
-    display(Image('candlestick.png'))
+    display(Image(filename))
     plt.close()
 
 # Buat dropdown untuk memilih tanggal
@@ -201,8 +202,12 @@ def on_date_change(change):
     # Deteksi pola candlestick
     pattern = detect_candlestick_pattern(open_price, close_price, max_price, min_price)
 
+    # Buat nama file berdasarkan tanggal
+    safe_date = date.replace('/', '-')
+    filename = f'candlestick_{safe_date}.png'
+
     # Buat candlestick chart
-    create_candlestick(max_price, min_price, open_price, close_price, date, pattern)
+    create_candlestick(max_price, min_price, open_price, close_price, date, pattern, filename)
 
 # Hubungkan dropdown ke fungsi
 date_dropdown.observe(on_date_change, names='value')
@@ -220,17 +225,72 @@ if not df.empty:
     close_price = row['close_price']
     date = row['date']
     pattern = detect_candlestick_pattern(open_price, close_price, max_price, min_price)
-    create_candlestick(max_price, min_price, open_price, close_price, date, pattern)
+    # Buat nama file berdasarkan tanggal default
+    safe_date = date.replace('/', '-')
+    filename = f'candlestick_{safe_date}.png'
+    create_candlestick(max_price, min_price, open_price, close_price, date, pattern, filename)
 
 # Tambah tombol untuk mengunduh chart
 download_button = widgets.Button(description="Download Chart")
 
 # Fungsi untuk menangani unduhan
 def on_download_button_clicked(b):
-    files.download('candlestick.png')
+    # Ambil tanggal yang dipilih dari dropdown
+    selected_date = date_dropdown.value
+    # Buat nama file berdasarkan tanggal
+    safe_date = selected_date.replace('/', '-')
+    filename = f'candlestick_{safe_date}.png'
+    files.download(filename)
 
 # Hubungkan tombol ke fungsi unduhan
 download_button.on_click(on_download_button_clicked)
 
 # Tampilkan tombol unduhan
 display(download_button)
+
+# Fungsi untuk membuat semua chart dan mengemasnya ke dalam ZIP
+def download_all_charts(b):
+    # Buat direktori sementara untuk menyimpan chart
+    os.makedirs('charts', exist_ok=True)
+    
+    # Iterasi melalui setiap baris di dataframe
+    for index, row in df.iterrows():
+        max_price = row['max_price']
+        min_price = row['min_price']
+        open_price = row['open_price']
+        close_price = row['close_price']
+        date = row['date']
+        
+        # Deteksi pola candlestick
+        pattern = detect_candlestick_pattern(open_price, close_price, max_price, min_price)
+        
+        # Buat nama file berdasarkan tanggal
+        safe_date = date.replace('/', '-')
+        chart_filename = f'charts/candlestick_{safe_date}.png'
+        
+        # Buat chart untuk tanggal ini
+        create_candlestick(max_price, min_price, open_price, close_price, date, pattern, chart_filename)
+    
+    # Buat file ZIP
+    zip_filename = 'all_candlestick_charts.zip'
+    with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for root, _, files_in_dir in os.walk('charts'):
+            for file in files_in_dir:
+                zipf.write(os.path.join(root, file), file)
+    
+    # Unduh file ZIP
+    files.download(zip_filename)
+    
+    # Bersihkan direktori sementara
+    for file in os.listdir('charts'):
+        os.remove(os.path.join('charts', file))
+    os.rmdir('charts')
+
+# Tambah tombol Download All
+download_all_button = widgets.Button(description="Download All Charts")
+
+# Hubungkan tombol ke fungsi
+download_all_button.on_click(download_all_charts)
+
+# Tampilkan tombol
+display(download_all_button)
