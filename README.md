@@ -4,7 +4,7 @@ A Python project to analyze and visualize candlestick patterns from financial da
 
 ## Overview
 
-This project provides a Jupyter Notebook (`candle.ipynb`) that fetches financial data from a Google Spreadsheet, detects candlestick patterns, and visualizes them as charts. The script is designed to run in Google Colab, making it accessible for users without a local Python setup. However, setting up Google Cloud credentials and preparing the spreadsheet can be a bit tricky—follow the steps below to get started.
+This project provides a Jupyter Notebook (`.ipynb`) that fetches financial data from a Google Spreadsheet, detects candlestick patterns, and visualizes them as charts. The script is designed to run in Google Colab, making it accessible for users without a local Python setup. However, setting up Google Cloud credentials and preparing the spreadsheet can be a bit tricky—follow the steps below to get started.
 
 ## Prerequisites
 
@@ -18,11 +18,11 @@ Before running the project, ensure you have the following:
 
 ### Step 1: Copy the Code
 
-1. Open the `candle.ipynb` file in this repository.
+1. Open the `candle.py` file in this repository.
 2. Copy all the code cells into a new Google Colab notebook:
    - Go to Google Colab.
    - Create a new notebook.
-   - Paste the code from `candle.ipynb` into the notebook cells.
+   - Paste the code from `candle.py` into the notebook cells.
 
 ### Step 2: Set Up Google Cloud Credentials
 
