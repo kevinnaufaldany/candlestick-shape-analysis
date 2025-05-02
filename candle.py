@@ -25,11 +25,11 @@ def detect_candlestick_pattern(open_price, close_price, max_price, min_price):
     is_hangiing_man = open_price == max_price
     is_inverted_hammer = open_price == min_price
     is_shooting_star = close_price == min_price
-    is_marubozu = lower_shadow == 0 and upper_shadow == 0
+    is_marubozu = (lower_shadow == 0) and (upper_shadow == 0)
     is_doji = body == 0
-    is_four_price_doji = max_price == 0 and min_price == 0
-    is_dragonfly_dogi = max_price == close_price and open_price
-    is_gravestone_doji = min_price == close_price and open_price
+    is_four_price_doji = (max_price == 0) and (min_price == 0)
+    is_dragonfly_dogi = (max_price == close_price == open_price)
+    is_gravestone_doji = (min_price == close_price == open_price)
 
     # 1. Deteksi Doji Patterns
     if is_four_price_doji:
